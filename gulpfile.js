@@ -42,11 +42,7 @@ gulp.task('connect', function () {
     });
 });
 
-gulp.task('serve', ['connect', 'watch'], function () {
-  require('opn')('http://localhost:9000');
-});
-
-gulp.task('watch', ['connect'], function () {
+gulp.task('watch', gulp.series(['connect'], function () {
   $.livereload.listen();
 
   gulp.watch([
@@ -58,11 +54,17 @@ gulp.task('watch', ['connect'], function () {
     'app/logo/**/*',
     'data/**.json'
   ]).on('change', $.livereload.changed);
-});
+}));
 
-gulp.task('build', ['jshint', 'test'], function () {
+gulp.task('serve', gulp.series(['connect', 'watch'], function () {
+  require('opn')('http://localhost:9000');
+}));
+
+
+
+gulp.task('build', gulp.series(['jshint', 'test'], function () {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
-});
+}));
 
 gulp.task('default', function () {
   gulp.start('build');
